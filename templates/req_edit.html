@@ -10,20 +10,15 @@
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <a class="navbar-brand" href="/">Лабороторная работа 4</a>
+  <a class="navbar-brand" href="/">Экзамен Семенников Кирилл 181-351(Так же сюда можно нажать)</a>
   <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+
       <li class="nav-item">
         <a class="nav-link" style="color:pink;"></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="/sub">Абоненты</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="/tariff">Тарифы</a>
-      </li>
-       <li class="nav-item">
-        <a class="nav-link" href="/town">Города</a>
+        <a class="nav-link" href="/req">Обращения клиентов</a>
       </li>
     </ul>
       <h4 class="text-white mr-3">{{ login }}</h4>
@@ -34,42 +29,56 @@
 
 
 <div class="content text-center">
-        <h4 class="text-center">edit sub</h4>
+        <h4 class="text-center">Изменить обращение</h4>
          <div class="col-md-4 my-4 border border-white rounded container text-center" id="main">
 
     <div class="container text-center">
-        <form class='form' method="post" action="/sub/edit/submit">
+        <form class='form' method="post" action="/req/edit/submit">
+            {%if user_role == 1%}
             <div class="form-group">
-            <label for="id">id</label>
-            <input type="number" class="form-control" id="id" placeholder="id" name="id" value="{{ sub["id"] }}">
+            <label for="id">ДАта</label>
+            <input type="date" class="form-control" id="id" placeholder="date" name="date" value="{{ req["date"] }}">
+                </div>
+
+             <input  type="hidden" name="user_id" value="{{user_id}}">
+            </input>
                 </div>
             <div class="form-group">
-            <label for="title">title</label>
-            <input type="text" class="form-control" id="title" placeholder="title" name="full_name" value="{{ sub["full_name"] }}">
-                </div>
-            <div class="form-group">
-            <label for="town">town</label>
-            <select name="town_id">
-            {% for town in towns %}
-                <option {% if town.id == sub["town_id"] %}
+            <label for="town">Тип</label>
+            <select name="type_id">
+            {% for type in types %}
+                <option {% if type.id == req["type_id"] %}
                 selected
-                {% endif %} value={{ town.id }} >{{ town.title }}</option>
+                {% endif %} value={{ type.id }} >{{ type.type }}</option>
                {% endfor %}
             </select>
                 </div>
+             {% endif %}
             <div class="form-group">
-            <label for="tariff">tariff</label>
-            <select name="tariff_id">
-            {% for tariff in tariffs %}
-                <option  {% if tariff.id == sub["tariff_id"] %}
-                selected value={{ tariff.id }}
+            <label for="tariff">status</label>
+            <select name="status_id">
+            {% for status in statuss %}
+                <option  {% if status.id == req["status_id"] %}
+                selected value={{ status.id }}
                 {% else %}
-                    value={{ tariff.id }}
-                {% endif %}>{{ tariff.title }}</option>
+                    value={{ status.id }}
+                {% endif %}>{{ status.status }}</option>
                {% endfor %}
             </select>
             </div>
-            <input type="hidden" value="{{ sub["id"] }}" name = "older_id">
+             {% if user_role == 1 %}
+              <div class="form-group">
+            <label for="id">Сообщение</label>
+            <input type="text" class="form-control" id="id" placeholder="message" name="message" value="{{ req["message"] }}">
+                </div>
+             {% endif %}
+            <input type="hidden" value="{{ req["id"] }}" name = "older_id">
+             {%if user_role == 2%}
+             <input type="hidden" value="{{ req["date"] }}" name = "date">
+             <input type="hidden" value="{{ req["type_id"] }}" name = "type_id">
+             <input type="hidden" value="{{ req["message"] }}" name = "message">
+             <input type="hidden" value="{{ req["user_id"] }}" name = "user_id">
+             {% endif %}
              <input type=submit class='btn btn-success' value='Изменить'>
         </form>
     </div>

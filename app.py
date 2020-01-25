@@ -95,20 +95,29 @@ def logout():
 @app.route('/req', methods=['GET'])
 @login_required
 def req():
-    req = db.select(None, "request")
-    users = db.select(["id","full_name"],"users")
-    type = db.select(None,"type_request")
-    status = db.select(None, "status_request")
+    error = request.args.get("error")
+    if error == None:
+        error = False
+    cursor = db.db.cursor(named_tuple=True)
+    cursor.execute('SELECT * FROM request order by date DESC ')
+    reqs = cursor.fetchall()
+    users = dict(db.select(["id", "full_name"], "users"))
+    type = dict(db.select(None, "type_request"))
+    status = dict(db.select(None, "status_request"))
     veiw_req = []
-    for sub in subs:
-        view_subs.append({"id": sub.id,
-                          "full_name": sub.full_name,
-                          "town": towns[sub.town_id],
-                          "tariff": tariffs[sub.tariff_id],
-                          "town_id": sub.town_id,
-                          "tariff_id": sub.tariff_id
-                          })
-    return render_template("req.html", login=flask_login.current_user.login, subs=view_subs)
+    for req in reqs:
+        veiw_req.append({"id": req.id,
+                         "date": req.date,
+                         "user": users.get(req.user_id),
+                         "type": type.get(req.type_id),
+                         "status": status.get(req.status_id),
+                         "message": req.message,
+                         "user_id": req.user_id,
+                         "type_id": req.type_id,
+                         "status_id": req.status_id
+                         })
+    return render_template("req.html", login=flask_login.current_user.login, reqs=veiw_req,
+                           role_id=flask_login.current_user.role_id, error=error)
 
 
 @app.route('/req/delete', methods=['POST'])
@@ -116,78 +125,92 @@ def req():
 def sub_delete():
     id = request.form.get("id")
     cursor = db.db.cursor()
-    cursor.execute("DELETE FROM `subscribers` WHERE `subscribers`.`id` = '%s'" % id)
+    cursor.execute("DELETE FROM `request` WHERE `request`.`id` = '%s'" % id)
     cursor.close()
-    return redirect("/sub")
+    return redirect("/req")
 
 
 @app.route('/req/new', methods=['POST', 'GET'])
 @login_required
 def sub_new():
+    if flask_login.current_user.role_id is not [1, 2]:
+        redirect("/")
     if request.method == 'GET':
-        towns = db.select(["id", "title"], "towns")
-        tariffs = db.select(["id", "title"], "tariffs")
-        return render_template("req_new.html", towns=towns, tariffs=tariffs)
+        error = request.args.get("error")
+        if error == None:
+            error = False
+        types = db.select(None, "type_request")
+        statuss = db.select(None, "status_request")
+        return render_template("req_new.html", types=types, statuss=statuss, error=error,
+                               user_id=flask_login.current_user.id)
     elif request.method == 'POST':
-        id = request.form.get("id")
-        full_name = request.form.get("full_name")
-        town_id = request.form.get("town")
-        tariff_id = request.form.get("tariff")
-        if id and full_name and town_id and tariff_id:
+        date = request.form.get("date")
+        message = request.form.get("message")
+        status_id = request.form.get("status_id")
+        type_id = request.form.get("type_id")
+        user_id = request.form.get("user_id")
+        if date and message and status_id and type_id and user_id:
             cursor = db.db.cursor(named_tuple=True)
             try:
                 cursor.execute(
-                    "INSERT INTO `subscribers` (`id`, `full_name`, `town_id`, `tariff_id`) VALUES ('%s', '%s', '%s', '%s')" % (
-                        id, full_name, town_id, tariff_id))
+                    "INSERT INTO `request` (`date`, `user_id`, `type_id`, `status_id`, `message`) VALUES ('%s', '%s', '%s', '%s','%s')" % (
+                        date, user_id, type_id, status_id, message))
                 db.db.commit()
                 cursor.close()
-                return redirect("/sub")
+                return redirect("/req")
             except Exception:
-                return render_template("req_new.html", login=flask_login.current_user.login, insert_false=True)
+                return url_for("req", error=True)
         else:
-            return render_template("req_new.html", login=flask_login.current_user.login, insert_false=True)
+            return url_for("req", error=True)
 
 
 @app.route('/req/edit', methods=['POST'])
 @login_required
 def sub_edit():
+    if flask_login.current_user.role_id is not [1, 2]:
+        redirect("/")
     try:
-        sub_id = request.form.get("id")
-        full_name = request.form.get("full_name")
-        town_id = request.form.get("town_id")
-        tariff_id = request.form.get("tariff_id")
-        towns = db.select(["id", "title"], "towns")
-        tariffs = db.select(["id", "title"], "tariffs")
-        sub = {
-            'id': sub_id,
-            'full_name': full_name,
-            'town_id': town_id,
-            'tariff_id': tariff_id
+        id = request.form.get("id")
+        date = request.form.get("date")
+        message = request.form.get("message")
+        status_id = request.form.get("status_id")
+        type_id = request.form.get("type_id")
+        user_id = request.form.get("user_id")
+        statuss = db.select(None, "status_request")
+        types = db.select(None, "type_request")
+        req = {
+            'id': id,
+            'date': date,
+            'message': message,
+            'status_id': status_id,
+            'type_id': type_id,
+            'older_id': id
         }
-        return render_template("req_edit.html", sub=sub, towns=towns, tariffs=tariffs,
-                               login=flask_login.current_user.login)
+        return render_template("req_edit.html", req=req, types=types, statuss=statuss,
+                               login=flask_login.current_user.login, user_id=user_id,
+                               user_role=flask_login.current_user.role_id)
     except Exception:
-        return redirect("/sub")
+        return redirect(url_for("req", error=True))
 
 
 @app.route('/req/edit/submit', methods=['POST'])
 @login_required
 def sub_edit_submit():
     older_id = request.form.get("older_id")
-    sub_id = request.form.get("id")
-    full_name = request.form.get("full_name")
-    town_id = request.form.get("town_id")
-    tariff_id = request.form.get("tariff_id")
-    if sub_id and full_name and town_id and tariff_id:
+    date = request.form.get("date")
+    status_id = request.form.get("status_id")
+    type_id = request.form.get("type_id")
+    message = request.form.get("message")
+    if date and older_id and status_id and type_id  and message:
         cursor = db.db.cursor(named_tuple=True)
         try:
             cursor.execute(
-                "UPDATE `subscribers` SET `id` = '%s', `full_name` = '%s', `town_id` = '%s', `tariff_id` = '%s' WHERE `subscribers`.`id` = %s" % (
-                    sub_id, full_name, town_id, tariff_id, older_id))
+                "UPDATE `request` SET  `date` = '%s', `status_id` = '%s',`type_id` = '%s',`message` = '%s' WHERE `request`.`id` = %s" % (
+                    date, status_id, type_id, message, older_id))
             db.db.commit()
             cursor.close()
-            return redirect("/sub")
+            return redirect(url_for("req"))
         except Exception:
-            return redirect("/sub")
+            return redirect(url_for("req", error=True))
     else:
-        return redirect("/sub")
+        return redirect(url_for("req", error=True))

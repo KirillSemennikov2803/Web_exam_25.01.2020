@@ -10,7 +10,7 @@
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-    <a class="navbar-brand" href="/">Экзамен Семенников Кирилл 181-351(Так же сбда можно нажать)</a>
+    <a class="navbar-brand" href="/">Экзамен Семенников Кирилл 181-351(Так же сюда можно нажать)</a>
   <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
 
@@ -33,6 +33,10 @@
 	<div class="content">
 
 	<h2 class="text-center mb-5">Главная страница</h2>
+        {% if authorization%}
+
+        <img class="rounded mx-auto d-block" src="http://www.securitylab.ru/upload/iblock/428/4284b025e0f383c54d9131305550448c.png" alt="альтернативный текст">
+        {% endif %}
        {% if not authorization %}
 	    <h4 class="text-center">Login</h4>
          <div class="col-md-4 my-4 border border-white rounded container text-center" id="main">
