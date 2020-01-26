@@ -22,7 +22,7 @@
       </li>
     </ul>
       <h4 class="text-white mr-3">{{ login }}</h4>
-      <a href="logout"><button type="button" class="btn btn-light">Разлогинься</button></a>
+      <a href="../logout"><button type="button" class="btn btn-light">Разлогинься</button></a>
   </div>
 </nav>
 
@@ -67,6 +67,7 @@
             </select>
             </div>
              {% if user_role == 1 %}
+             <label>user - {{ req["user"] }} </label>
               <div class="form-group">
             <label for="id">Сообщение</label>
             <input type="text" class="form-control" id="id" placeholder="message" name="message" value="{{ req["message"] }}">
@@ -74,6 +75,10 @@
              {% endif %}
             <input type="hidden" value="{{ req["id"] }}" name = "older_id">
              {%if user_role == 2%}
+             <p>data - {{ req["date"] }} </p>
+             <p>type - {{ req["type"] }} </p>
+             <p>message - {{ req["message"] }} </p>
+             <p>user - {{ req["user"] }} </p>
              <input type="hidden" value="{{ req["date"] }}" name = "date">
              <input type="hidden" value="{{ req["type_id"] }}" name = "type_id">
              <input type="hidden" value="{{ req["message"] }}" name = "message">

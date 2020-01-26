@@ -22,7 +22,7 @@
       </li>
     </ul>
       <h4 class="text-white mr-3">{{ login }}</h4>
-      <a href="logout"><button type="button" class="btn btn-light">Разлогинься</button></a>
+      <a href="../logout"><button type="button" class="btn btn-light">Разлогинься</button></a>
   </div>
 </nav>
     <div class="d-flex justify-content-center">
@@ -55,6 +55,8 @@
                          <input type="hidden" name="type_id" value="{{ req["type_id"] }}">
                         <input type="hidden" name="status_id" value="{{req["status_id"] }}">
                         <input type="hidden" name="user_id" value="{{req["user_id"] }}">
+                        <input type="hidden" name="user" value="{{req["user"] }}">
+                    <input type="hidden" name="type" value="{{req["type"] }}">
                         <input type="hidden" name="message" value="{{req["message"] }}">
 						<button type="submit" class="btn btn-primary">edit</button>
 					</form></td>

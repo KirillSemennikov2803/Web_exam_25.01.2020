@@ -157,7 +157,7 @@ def sub_new():
                         date, user_id, type_id, status_id, message))
                 db.db.commit()
                 cursor.close()
-                return redirect("/req")
+                return redirect("req")
             except Exception:
                 return url_for("req", error=True)
         else:
@@ -176,6 +176,8 @@ def sub_edit():
         status_id = request.form.get("status_id")
         type_id = request.form.get("type_id")
         user_id = request.form.get("user_id")
+        user = request.form.get("user")
+        type = request.form.get("type")
         statuss = db.select(None, "status_request")
         types = db.select(None, "type_request")
         req = {
@@ -184,7 +186,9 @@ def sub_edit():
             'message': message,
             'status_id': status_id,
             'type_id': type_id,
-            'older_id': id
+            'older_id': id,
+            'user': user,
+            'type': type
         }
         return render_template("req_edit.html", req=req, types=types, statuss=statuss,
                                login=flask_login.current_user.login, user_id=user_id,
@@ -201,7 +205,7 @@ def sub_edit_submit():
     status_id = request.form.get("status_id")
     type_id = request.form.get("type_id")
     message = request.form.get("message")
-    if date and older_id and status_id and type_id  and message:
+    if date and older_id and status_id and type_id and message:
         cursor = db.db.cursor(named_tuple=True)
         try:
             cursor.execute(
