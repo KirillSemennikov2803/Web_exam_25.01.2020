@@ -219,6 +219,6 @@ def sub_edit_submit():
     else:
         return redirect(url_for("req", error=True))
 
-
+app = application
 if __name__ == "__main__":
     application.run(host='0.0.0.0')
