@@ -1,4 +1,4 @@
-MYSQL_USER = 'std_848'
-MYSQL_PASSWORD = 'adminadmin'
-MYSQL_HOST = 'std-mysql'
-MYSQL_DATABASE = 'std_848'
+MYSQL_USER = 'u0933244_default'
+MYSQL_PASSWORD = 'H6_oWN28'
+MYSQL_HOST = 'localhost'
+MYSQL_DATABASE = 'u0933244_default'
